@@ -9,16 +9,17 @@
 
 ---
 
-Voice Input is a global hotkey-based voice dictation tool for Linux. Simply press `Ctrl+Q` to start recording your voice, and the system will automatically transcribe it into text and paste it into your currently focused input field. It supports multiple languages including Chinese, English, Japanese, Korean, and Cantonese, with the best recognition accuracy for Chinese. The UI language adapts to your speaking habits over time. Works seamlessly on both X11 and Wayland desktop sessions, with automatic startup support on system boot.
+Voice Input is a global hotkey-based voice dictation tool for Linux. Simply press `Alt+Q` or `Alt+W` to start recording your voice, and the system will automatically transcribe it into text and paste it into your currently focused input field. It supports multiple languages including Chinese, English, Japanese, Korean, and Cantonese, with the best recognition accuracy for Chinese. The UI language adapts to your speaking habits over time. Works seamlessly on both X11 and Wayland desktop sessions, with automatic startup support on system boot.
 
 ## Features
 
-- **Global Hotkey** - Press `Alt+Q` to start/stop recording (customizable)
+- **Dual Hotkeys** - `Alt+Q` (auto-enter) or `Alt+W` (manual-enter)
 - **Multi-language Support** - Automatic recognition of Chinese, English, Japanese, Korean, Cantonese
 - **Smart UI Language** - UI automatically switches to match your speaking habits
 - **Dual Platform** - Perfect support for both X11 and Wayland sessions
 - **Real-time Volume Display** - Shows volume waveform animation during recording
 - **Auto-paste** - Automatically pastes recognized text to focused window
+- **Cancel Recording** - Press `ESC` to cancel during recording
 - **Auto-start** - Automatically starts on system boot
 - **Offline** - No network required, all processing done locally
 
@@ -86,10 +87,13 @@ cd ~/.voice-input
 
 1. Ensure the daemon is running (starts automatically on boot)
 2. Click on the target input field
-3. Press `Alt+Q` to start recording
+3. Press `Alt+Q` (auto-enter) or `Alt+W` (manual-enter) to start recording
 4. Speak
-5. Press `Alt+Q` again to stop recording
+5. Press `Alt+Q` or `Alt+W` again to stop recording
 6. Text is automatically pasted into the input field
+   - With `Alt+Q`: Enter is automatically pressed after pasting
+   - With `Alt+W`: Enter is NOT pressed (manual)
+7. Press `ESC` during recording to cancel
 
 ## Configuration
 
@@ -98,7 +102,10 @@ Configuration file: `~/.config/voice-input/config`
 ```ini
 [hotkey]
 # Modifiers + main key. Modifiers: ctrl, alt, shift, meta
+# Alt+Q: auto-enter mode (automatically press Enter after typing)
+# Alt+W: manual-enter mode (no automatic Enter press)
 key = Alt+Q
+key2 = Alt+W
 
 [recognition]
 # Language: auto (auto-detect), zh (Chinese), en (English), ja (Japanese), ko (Korean), yue (Cantonese)
