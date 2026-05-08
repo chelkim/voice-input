@@ -49,7 +49,7 @@ def paste_text():
         pass
 
 
-def type_text(text):
+def type_text(text, auto_enter=False):
     """Type text via clipboard + paste"""
     try:
         subprocess.run(
@@ -59,5 +59,12 @@ def type_text(text):
         )
         time.sleep(0.05)
         paste_text()
+
+        if auto_enter:
+            time.sleep(0.05)
+            subprocess.run(
+                ['xdotool', 'key', 'Return'],
+                capture_output=True, timeout=1
+            )
     except:
         pass

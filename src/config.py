@@ -134,6 +134,7 @@ def load_config() -> Dict:
         "hotkey_key": "q",
         "language": "auto",  # Recognition language: auto, zh, en, ja, ko, yue
         "ui_language": "auto",  # UI display language: auto, zh, en, ja, ko, yue
+        "auto_enter": False,  # Auto press Enter after typing text
     }
 
     # Ensure config directory exists
@@ -167,6 +168,12 @@ def load_config() -> Dict:
                 if ui_lang in ("auto", "zh", "en", "ja", "ko", "yue"):
                     config["ui_language"] = ui_lang
                     print(f"Loaded UI language setting from config: {ui_lang}")
+
+            # Parse typing settings
+            if parser.has_section("typing"):
+                auto_enter = parser.getboolean("typing", "auto_enter", fallback=False)
+                config["auto_enter"] = auto_enter
+                print(f"Loaded typing settings: auto_enter={auto_enter}")
 
         except Exception as e:
             print(f"Failed to read config file: {e}")
@@ -229,6 +236,10 @@ def _create_default_config():
             f.write("# UI display language: auto, zh, en, ja, ko, yue\n")
             f.write("# auto will auto-detect based on your speaking habits\n")
             f.write("language = auto\n")
+            f.write("\n")
+            f.write("[typing]\n")
+            f.write("# Auto press Enter after typing text\n")
+            f.write("auto_enter = false\n")
         print(f"Created default config file: {CONFIG_FILE}")
     except Exception as e:
         print(f"Failed to create config file: {e}")
