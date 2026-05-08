@@ -1,5 +1,5 @@
 """
-键盘捕获模块
+Keyboard capture module
 """
 from .base import BaseKeyboardCapture
 

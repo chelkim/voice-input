@@ -1,5 +1,5 @@
 """
-UI 模块
+UI module
 """
 from .overlay import RecordingOverlay
 

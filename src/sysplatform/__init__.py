@@ -1,5 +1,5 @@
 """
-平台抽象层
+Platform abstraction layer
 """
 from .base import PlatformTools
 

@@ -1,5 +1,5 @@
 """
-语音识别模块
+Speech recognition module
 """
 from .sensevoice import SenseVoiceRecognizer
 

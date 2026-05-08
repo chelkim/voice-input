@@ -56,7 +56,7 @@ def detect_language_from_text(text: str) -> str:
         return "auto"
 
     # Count character types
-    chinese_chars = len(re.findall(r'[一-鿿]', text))  # Chinese
+    chinese_chars = len(re.findall(r'[一-鿿]', text))  # Chinese characters
     japanese_chars = len(re.findall(r'[぀-ゟ゠-ヿ]', text))  # Hiragana/Katakana
     korean_chars = len(re.findall(r'[가-힯]', text))  # Hangul
     english_words = len(re.findall(r'[a-zA-Z]{2,}', text))  # English words

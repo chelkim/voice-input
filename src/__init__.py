@@ -1,4 +1,4 @@
 """
-Voice Input - 语音输入系统
+Voice Input - Global hotkey voice dictation tool
 """
 __version__ = "1.0.0"

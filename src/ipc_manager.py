@@ -61,7 +61,7 @@ class IPCManager:
 
     def type_text(self, text, window_id=None):
         """Type text via clipboard + paste (runs in main process)"""
-        from src.typing import type_text as do_type_text
+        from src.text_input import type_text as do_type_text
         do_type_text(text)
 
     def stop(self):

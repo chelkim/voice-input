@@ -1,5 +1,5 @@
 """
-音频录制模块
+Audio recording module
 """
 from .recorder import AudioRecorder
 
