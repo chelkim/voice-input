@@ -2,7 +2,7 @@
 X11 keyboard capture using pynput
 """
 from pynput import keyboard
-from typing import Callable, Set
+from typing import Callable, Set, Optional
 
 from ..config import HOTKEY_CONFIG
 from .base import BaseKeyboardCapture
@@ -11,8 +11,8 @@ from .base import BaseKeyboardCapture
 class X11KeyboardCapture(BaseKeyboardCapture):
     """X11 keyboard capture using pynput"""
 
-    def __init__(self, on_hotkey: Callable):
-        super().__init__(on_hotkey)
+    def __init__(self, on_hotkey: Callable, on_cancel: Optional[Callable] = None):
+        super().__init__(on_hotkey, on_cancel)
         self.mods_pressed: Set[str] = set()  # Currently pressed modifier keys
         self.listener = None
         self.hotkey_key = HOTKEY_CONFIG["hotkey_key"]
@@ -33,6 +33,12 @@ class X11KeyboardCapture(BaseKeyboardCapture):
 
     def start(self):
         def on_press(key):
+            # Check for ESC key
+            if key == keyboard.Key.esc:
+                if self.on_cancel:
+                    self.on_cancel()
+                return
+
             mod = self._is_mod_key(key)
             if mod:
                 self.mods_pressed.add(mod)

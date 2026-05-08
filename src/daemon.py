@@ -59,6 +59,19 @@ def init_recognizer():
     recognizer = SenseVoiceRecognizer(language=language)
 
 
+def on_cancel():
+    """Called when ESC is pressed during recording to cancel"""
+    global target_window
+
+    if audio_recorder.recording:
+        log("CANCEL_RECORDING")
+        audio_recorder.stop_recording()
+        audio_recorder.set_volume_callback(None)
+        target_window = None
+        ipc.hide()
+        log("RECORDING_CANCELLED")
+
+
 def on_activate():
     global target_window
 
@@ -142,15 +155,15 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
 
     if SESSION_TYPE == 'x11':
-        keyboard_capture = X11KeyboardCapture(on_activate)
+        keyboard_capture = X11KeyboardCapture(on_activate, on_cancel)
     elif SESSION_TYPE == 'wayland':
         if platform.evdev_ok:
-            keyboard_capture = WaylandKeyboardCapture(on_activate)
+            keyboard_capture = WaylandKeyboardCapture(on_activate, on_cancel)
         else:
             log("WAYLAND_NO_EVDEV")
             sys.exit(1)
     else:
-        keyboard_capture = X11KeyboardCapture(on_activate)
+        keyboard_capture = X11KeyboardCapture(on_activate, on_cancel)
 
     if keyboard_capture:
         keyboard_capture.start()

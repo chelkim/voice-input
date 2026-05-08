@@ -3,7 +3,7 @@ Wayland keyboard capture using evdev
 """
 import evdev
 import threading
-from typing import Callable, Set
+from typing import Callable, Set, Optional
 
 from ..config import HOTKEY_CONFIG
 from .base import BaseKeyboardCapture
@@ -20,8 +20,11 @@ class WaylandKeyboardCapture(BaseKeyboardCapture):
         "meta": [125, 126], # KEY_LEFTMETA, KEY_RIGHTMETA
     }
 
-    def __init__(self, on_hotkey: Callable):
-        super().__init__(on_hotkey)
+    # ESC key code
+    ESC_KEYCODE = 1  # KEY_ESC
+
+    def __init__(self, on_hotkey: Callable, on_cancel: Optional[Callable] = None):
+        super().__init__(on_hotkey, on_cancel)
         self.mods_pressed: Set[str] = set()
         self.hotkey_key = HOTKEY_CONFIG["hotkey_key"].upper()
         self.hotkey_mods = set(HOTKEY_CONFIG["hotkey_mods"])
@@ -93,6 +96,12 @@ class WaylandKeyboardCapture(BaseKeyboardCapture):
                 if not self.running:
                     break
                 if event.type == evdev.ecodes.EV_KEY:
+                    # Check for ESC key
+                    if event.code == self.ESC_KEYCODE and event.value == 1:
+                        if self.on_cancel:
+                            self.on_cancel()
+                        continue
+
                     # Track modifier key state
                     for mod, codes in self.MOD_KEYCODES.items():
                         if event.code in codes:
