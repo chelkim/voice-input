@@ -1,0 +1,25 @@
+# 模型文件（太大，不提交）
+models/
+
+# Python 虚拟环境
+venv-voice/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Log files
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 本地 Claude Code 记忆（不提交）
+CLAUDE.md

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Voice Input Daemon
+Comment=Voice input with Ctrl+Q
+Exec=/home/ck/.voice-input/venv-voice/bin/python3 /home/ck/.voice-input/src/daemon.py
+Hidden=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
