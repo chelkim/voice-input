@@ -51,6 +51,7 @@ keyboard_capture = None
 audio_recorder = AudioRecorder()
 recognizer = None
 target_window = None
+_current_auto_enter = False  # Track auto_enter mode for current recording
 
 
 def init_recognizer():
@@ -72,24 +73,27 @@ def on_cancel():
         log("RECORDING_CANCELLED")
 
 
-def on_activate():
-    global target_window
+def on_activate(auto_enter: bool = False):
+    """Called when hotkey is pressed. auto_enter determines if Enter is pressed after typing."""
+    global target_window, _current_auto_enter
 
     if audio_recorder.recording:
         audio_recorder.stop_recording()
         ipc.hide()
         audio_recorder.set_volume_callback(None)
+        _current_auto_enter = auto_enter
         threading.Thread(target=transcribe_and_type, daemon=True).start()
     else:
         target_window = platform.get_focused_window()
-        log(f"START_RECORDING window={target_window}")
+        _current_auto_enter = auto_enter
+        log(f"START_RECORDING window={target_window} auto_enter={auto_enter}")
         ipc.show_recording()
         audio_recorder.set_volume_callback(ipc.update_volume)
         audio_recorder.start_recording()
 
 
 def transcribe_and_type():
-    global target_window
+    global target_window, _current_auto_enter
 
     log(f"START_TRANSCRIBE")
     ipc.show_transcribing()
@@ -103,8 +107,8 @@ def transcribe_and_type():
             record_transcription_language(detected_lang)
             log(f"HIDE_SPIN")
             ipc.hide()
-            log(f"TYPE_TEXT_START text={text!r} window={target_window}")
-            ipc.type_text(text, target_window)
+            log(f"TYPE_TEXT_START text={text!r} window={target_window} auto_enter={_current_auto_enter}")
+            ipc.type_text(text, target_window, auto_enter=_current_auto_enter)
             log(f"TYPE_TEXT_SENT")
         else:
             log("TRANSCRIBE_EMPTY")
@@ -154,6 +158,9 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    hotkey2_key = HOTKEY_CONFIG.get("hotkey2_key", "w")
+    hotkey2_mods = HOTKEY_CONFIG.get("hotkey2_mods", ["ctrl"])
+
     if SESSION_TYPE == 'x11':
         keyboard_capture = X11KeyboardCapture(on_activate, on_cancel)
     elif SESSION_TYPE == 'wayland':
@@ -171,7 +178,7 @@ def main():
         log("KEYBOARD_CAPTURE_ERROR")
         sys.exit(1)
 
-    log(f"SERVICE_READY hotkey={HOTKEY_CONFIG['hotkey_mods']}+{HOTKEY_CONFIG['hotkey_key']}")
+    log(f"SERVICE_READY hotkey1={HOTKEY_CONFIG['hotkey_mods']}+{HOTKEY_CONFIG['hotkey_key']} (auto-enter) hotkey2={hotkey2_mods}+{hotkey2_key} (manual-enter)")
 
     while True:
         time.sleep(1)

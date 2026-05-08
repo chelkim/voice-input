@@ -59,11 +59,9 @@ class IPCManager:
             self._overlay_process.stdin.write(msg.encode())
             self._overlay_process.stdin.flush()
 
-    def type_text(self, text, window_id=None):
+    def type_text(self, text, window_id=None, auto_enter=False):
         """Type text via clipboard + paste (runs in main process)"""
-        from src.config import HOTKEY_CONFIG
         from src.text_input import type_text as do_type_text
-        auto_enter = HOTKEY_CONFIG.get("auto_enter", False)
         do_type_text(text, auto_enter=auto_enter)
 
     def stop(self):

@@ -28,6 +28,9 @@ class WaylandKeyboardCapture(BaseKeyboardCapture):
         self.mods_pressed: Set[str] = set()
         self.hotkey_key = HOTKEY_CONFIG["hotkey_key"].upper()
         self.hotkey_mods = set(HOTKEY_CONFIG["hotkey_mods"])
+        # Second hotkey (manual enter mode)
+        self.hotkey2_key = HOTKEY_CONFIG.get("hotkey2_key", "w").upper()
+        self.hotkey2_mods = set(HOTKEY_CONFIG.get("hotkey2_mods", ["ctrl"]))
         self.keyboard_device = None
         self.thread = None
         self._find_keyboard()
@@ -83,14 +86,16 @@ class WaylandKeyboardCapture(BaseKeyboardCapture):
         try:
             dev = evdev.InputDevice(self.keyboard_device)
 
-            # Get main key keycode
+            # Get main key keycodes
             hotkey_keycode = self._get_key_code(self.hotkey_key)
+            hotkey2_keycode = self._get_key_code(self.hotkey2_key)
             if hotkey_keycode is None:
                 print(f"Warning: Cannot get keycode for {self.hotkey_key}")
                 return
 
             print(f"Keyboard capture started, listening on: {self.keyboard_device}", flush=True)
-            print(f"Hotkey: {'+'.join(sorted(self.hotkey_mods))}+{self.hotkey_key} (keycode={hotkey_keycode})", flush=True)
+            print(f"Hotkey1: {'+'.join(sorted(self.hotkey_mods))}+{self.hotkey_key} (keycode={hotkey_keycode})", flush=True)
+            print(f"Hotkey2: {'+'.join(sorted(self.hotkey2_mods))}+{self.hotkey2_key} (keycode={hotkey2_keycode})", flush=True)
 
             for event in dev.read_loop():
                 if not self.running:
@@ -110,12 +115,17 @@ class WaylandKeyboardCapture(BaseKeyboardCapture):
                             elif event.value == 0:  # Release
                                 self.mods_pressed.discard(mod)
 
-                    # Check if main key is pressed
+                    # Check if hotkey1 is pressed (auto-enter mode)
                     if event.code == hotkey_keycode and event.value == 1:
-                        # Check if all modifiers are pressed
                         if self.mods_pressed == self.hotkey_mods:
-                            print(f"*** {'+'.join(sorted(self.hotkey_mods))}+{self.hotkey_key} detected! ***", flush=True)
-                            self.on_hotkey()
+                            print(f"*** {'+'.join(sorted(self.hotkey_mods))}+{self.hotkey_key} detected! (auto-enter) ***", flush=True)
+                            self.on_hotkey(auto_enter=True)
+
+                    # Check if hotkey2 is pressed (manual-enter mode)
+                    if event.code == hotkey2_keycode and event.value == 1:
+                        if self.mods_pressed == self.hotkey2_mods:
+                            print(f"*** {'+'.join(sorted(self.hotkey2_mods))}+{self.hotkey2_key} detected! (manual-enter) ***", flush=True)
+                            self.on_hotkey(auto_enter=False)
         except Exception as e:
             print(f"Keyboard capture error: {e}", flush=True)
 

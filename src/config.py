@@ -134,7 +134,7 @@ def load_config() -> Dict:
         "hotkey_key": "q",
         "language": "auto",  # Recognition language: auto, zh, en, ja, ko, yue
         "ui_language": "auto",  # UI display language: auto, zh, en, ja, ko, yue
-        "auto_enter": False,  # Auto press Enter after typing text
+        "auto_enter": False,  # Auto press Enter after typing text (for hotkey 1)
     }
 
     # Ensure config directory exists
@@ -152,6 +152,13 @@ def load_config() -> Dict:
                 config["hotkey_mods"] = hotkey_mods
                 config["hotkey_key"] = hotkey_key
                 print(f"Loaded hotkey from config: {hotkey_str}")
+
+                # Parse second hotkey (manual enter mode)
+                hotkey2_str = parser.get("hotkey", "key2", fallback="Ctrl+W").strip()
+                hotkey2_mods, hotkey2_key = _parse_hotkey(hotkey2_str)
+                config["hotkey2_mods"] = hotkey2_mods
+                config["hotkey2_key"] = hotkey2_key
+                print(f"Loaded hotkey2 from config: {hotkey2_str}")
 
             # Parse recognition language setting
             if parser.has_section("recognition"):
@@ -225,7 +232,10 @@ def _create_default_config():
         with open(CONFIG_FILE, 'w') as f:
             f.write("[hotkey]\n")
             f.write("# Hotkey setting (modifiers+main key). Modifiers: ctrl, alt, shift, meta\n")
+            f.write("# Alt+Q: auto-enter mode (automatically press Enter after typing)\n")
+            f.write("# Alt+W: manual-enter mode (no automatic Enter press)\n")
             f.write("key = Ctrl+Q\n")
+            f.write("key2 = Ctrl+W\n")
             f.write("\n")
             f.write("[recognition]\n")
             f.write("# Language: auto, zh, en, ja, ko, yue\n")

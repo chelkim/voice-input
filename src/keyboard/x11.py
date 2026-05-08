@@ -17,6 +17,9 @@ class X11KeyboardCapture(BaseKeyboardCapture):
         self.listener = None
         self.hotkey_key = HOTKEY_CONFIG["hotkey_key"]
         self.hotkey_mods = set(HOTKEY_CONFIG["hotkey_mods"])
+        # Second hotkey (manual enter mode)
+        self.hotkey2_key = HOTKEY_CONFIG.get("hotkey2_key", "w")
+        self.hotkey2_mods = set(HOTKEY_CONFIG.get("hotkey2_mods", ["ctrl"]))
 
     def _is_mod_key(self, key) -> str:
         """Check if key is a modifier, return modifier name"""
@@ -43,11 +46,15 @@ class X11KeyboardCapture(BaseKeyboardCapture):
             if mod:
                 self.mods_pressed.add(mod)
             else:
-                # Check if hotkey matches
                 key_char = getattr(key, 'char', None)
-                if key_char and key_char.lower() == self.hotkey_key:
-                    if self.mods_pressed == self.hotkey_mods:
-                        self.on_hotkey()
+                if key_char:
+                    key_char_lower = key_char.lower()
+                    # Check hotkey1 (auto-enter mode)
+                    if key_char_lower == self.hotkey_key and self.mods_pressed == self.hotkey_mods:
+                        self.on_hotkey(auto_enter=True)
+                    # Check hotkey2 (manual-enter mode)
+                    elif key_char_lower == self.hotkey2_key and self.mods_pressed == self.hotkey2_mods:
+                        self.on_hotkey(auto_enter=False)
 
         def on_release(key):
             mod = self._is_mod_key(key)
