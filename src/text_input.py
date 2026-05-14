@@ -22,7 +22,8 @@ def is_terminal_window():
         terminal_names = ['gnome-terminal', 'konsole', 'xterm', 'uxterm',
                          'terminator', 'alacritty', 'kitty',
                          'tilix', 'terminology', 'lilyterm', 'termite',
-                         'gnome-terminal-server', 'warp']
+                         'gnome-terminal-server', 'warp',
+                         'google-chrome', 'chrome']
 
         for term in terminal_names:
             if term in output:
